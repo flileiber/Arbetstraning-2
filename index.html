@@ -80,39 +80,39 @@
 const LABELS = ["","Sällan","Ibland","Ofta","Mestadels","Alltid"];
 const axes = [
   { name:"Uthållighet", desc:"Orkar personen arbeta under passet?", color:"#e07b6a", questions:[
-    {q:"Sover och äter du okej?", note:"Grundförutsättningar för dagen"},
-    {q:"Brukar du märka att du behöver ta en paus?", note:"Självkännedom kring trötthet"},
-    {q:"Kan du känna dig trött mitt under dagen? Vad brukar hjälpa?", note:"Strategier och återhämtning"},
-    {q:"Är orken bättre eller sämre mot slutet av passet jämfört med i början?", note:"Uthållighet över tid"}
+    {q:"Personen arbetar aktivt under hela passet utan längre avbrott?", note:"Grundförutsättningar för dagen"},
+    {q:"Personen återgår till arbetet efter paus självmant?", note:"Självkännedom kring trötthet"},
+    {q:"Personen visar energi och fokus även mot slutet av arbetsdagen?", note:"Strategier och återhämtning"},
+    {q:"Personen klarar att hålla igång trots att en uppgift kan ta tid?", note:"Uthållighet över tid"}
   ]},
   { name:"Social samvaro", desc:"Trivs personen med andra på arbetsplatsen?", color:"#e8b86d", questions:[
-    {q:"Känner du trivsel bland andra som är här?", note:"Grundtrivsel i grupp"},
-    {q:"Om du inte förstår något – frågar du då?", note:"Kommunikation vid osäkerhet"},
-    {q:"Är det ok för dig att ta emot tips från någon annan om hur du kan göra annorlunda?", note:"Ta emot återkoppling"},
-    {q:"Är det någon här du trivs extra bra med att jobba nära?", note:"Relationer på arbetsplatsen"}
+    {q:"Personen hälsar och har ögonkontakt med kollegor?", note:"Grundtrivsel i grupp"},
+    {q:"Personen söker kontakt med andra på arbetsplatsen?", note:"Kommunikation vid osäkerhet"},
+    {q:"Personen tar emot återkoppling utan att bli upprörd?", note:"Ta emot återkoppling"},
+    {q:"personen frågar om hjälp när något är oklart?", note:"Relationer på arbetsplatsen"}
   ]},
-  { name:"Förstå uppgifter", desc:"Tar personen till sig instruktioner?", color:"#7eb8a4", questions:[
-    {q:"Vad fungerar bäst för dig att arbetsledaren leder?", note:"Inlärningsstil"},
-    {q:"Känns det ok när du ska sätta igång med en ny uppgift?", note:"Förståelse och trygghet"},
-    {q:"Om du inte riktigt förstår frågar du andra då?", note:"Frågar eller försöker på egen hand"},
-    {q:"Säger du till när du är klar med något?", note:"Avslutar och övergår rätt"}
+  { name:"Förstå uppgifter", desc:"Personen sätter igång med uppgiften efter instruktionen?", color:"#7eb8a4", questions:[
+    {q:"Personen utför uppgiften på rätt sätt utan att behöva korrigeras?", note:"Inlärningsstil"},
+    {q:"Personen frågar när något är oklart istället för att gissa?", note:"Förståelse och trygghet"},
+    {q:"Personen avslutar uppgiften och går vidare till nästa, om det är klart vad det är?", note:"Frågar eller försöker på egen hand"},
+    {q:"Personen säger till när den är klar med något?", note:"Avslutar och övergår rätt"}
   ]},
-  { name:"Eget initiativ", desc:"Tar personen egna steg framåt?", color:"#6d9ee8", questions:[
-    {q:"Känns det ok att komma igång med något du vet ska göras?", note:"Initiativförmåga"},
-    {q:"Om handledaren är upptagen, frågar du andra då?", note:"Självständighet utan stöd"},
-    {q:"Kärner du att det finns något du tycker du blivit bättre på sedan du började här?", note:"Utveckling och självbild"},
-    {q:"Känne du att det något du skulle vilja prova eller lära dig mer om?", note:"Drivkraft och intresse"}
+  { name:"Eget initiativ", desc:"?", color:"#6d9ee8", questions:[
+    {q:"Personen börjar med uppgifter utan att behöva uppmanas?", note:"Initiativförmåga"},
+    {q:"Personen fortsätter arbeta även när handledaren inte är närvarande?", note:"Självständighet utan stöd"},
+    {q:"Personen tar egna små beslut under arbetet?", note:"Utveckling och självbild"},
+    {q:"Personen visar intresse för att lära sig nya saker.?", note:"Drivkraft och intresse"}
   ]},
-  { name:"Hantera förändringar", desc:"Klarar personen av det oväntade?", color:"#b86de8", questions:[
-    {q:"Känner du att det kan kännas om dagen inte blir som du tänkt dig?", note:"Flexibilitet vid ändringar"},
-    {q:"Om något går fel eller krånglar – säger du till då?", note:"Problemhantering"},
-    {q:"Tar det lång tid för dig innan du känner dig trygg med något nytt?", note:"Anpassningstid"},
+  { name:"Hantera förändringar", desc:"Personen accepterar förändring i dagens planering utan stark reaktion?", color:"#b86de8", questions:[
+    {q:"Personen ber om hjälp när något krånglar?", note:"Flexibilitet vid ändringar"},
+    {q:"Personen anpassar sig till nya rutiner eller kollegor i rimlig tid?", note:"Problemhantering"},
+    {q:"Personen behåller fokus på arbetet öven nör det uppstår oväntade situationer?", note:"Anpassningstid"},
     {q:"Känns det som att det finns något här som ibland känns svårt eller jobbigt?", note:"Öppen fråga om belastning"}
   ]},
-  { name:"Närvaro & rutiner", desc:"Fungerar vardagen runt arbetspasset?", color:"#e8946d", questions:[
-    {q:"Fungerar att ta sig hit i tid?", note:"Punktlighet och praktik"},
-    {q:"Hur är morgnarna för dig – kommer du igång?", note:"Morgonrutin"},
-    {q:"Om du vet i förväg att du inte kan komma – Vad känns normalt rätt att göra?", note:"Kommunicerar frånvaro"},
+  { name:"Närvaro & rutiner", desc:"Personen kommer i tid till arbetspasset?", color:"#e8946d", questions:[
+    {q:"Personen meddelar i förväg när hen inte kan komma?", note:"Punktlighet och praktik"},
+    {q:"Personen är redo att arbeta när hen anländer?", note:"Morgonrutin"},
+    {q:"Personen har en stabil närvaro över tid utan stort frånvaromönster?", note:"Kommunicerar frånvaro"},
     {q:"Känner du dig redo och pigg när du väl är här?", note:"Närvaro och fokus på plats"}
   ]}
 ];
