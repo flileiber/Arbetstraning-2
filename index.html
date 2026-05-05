@@ -1,1 +1,261 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arbetsträning – Samtalsstöd</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
 
+  :root {
+    --bg: #1c2433; --card: #242f42; --card2: #2a3649;
+    --border: #364558; --text: #e8e2d8; --muted: #8a9ab5; --accent: #e8b86d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: var(--bg); color: var(--text); font-family: 'Source Sans 3', sans-serif; min-height: 100vh; font-size: 16px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: #161e2b; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 0.8rem; }
+  .topbar-title { font-family: 'Lora', serif; font-size: 1.1rem; color: var(--accent); }
+  .topbar-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+  .topbar-meta { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 1.2rem; }
+  .progress-bar-wrap { width: 120px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+
+  .print-area { display: flex; align-items: center; gap: 0.8rem; }
+  .name-input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 5px; font-family: 'Source Sans 3', sans-serif; font-size: 0.85rem; width: 160px; }
+  .name-input::placeholder { color: var(--muted); }
+  .date-input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 5px; font-family: 'Source Sans 3', sans-serif; font-size: 0.85rem; width: 140px; }
+
+  .print-btn { background: var(--accent); color: #1c2433; border: none; padding: 0.45rem 1.1rem; border-radius: 5px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: opacity 0.15s; }
+  .print-btn:hover { opacity: 0.85; }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
+  @media (max-width: 860px) { .main { grid-template-columns: 1fr; padding: 1rem; } }
+
+  .axis-section { display: flex; flex-direction: column; gap: 1.2rem; }
+  .axis-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .axis-head { padding: 1rem 1.4rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; user-select: none; }
+  .axis-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #1c2433; flex-shrink: 0; }
+  .axis-info { flex: 1; }
+  .axis-name { font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; }
+  .axis-desc { font-size: 0.77rem; color: var(--muted); margin-top: 0.15rem; font-weight: 300; }
+  .axis-score-badge { font-family: 'Lora', serif; font-size: 1.4rem; min-width: 2rem; text-align: right; }
+  .toggle-arrow { color: var(--muted); font-size: 0.75rem; transition: transform 0.2s; margin-left: -0.4rem; }
+  .axis-card.collapsed .toggle-arrow { transform: rotate(-90deg); }
+  .axis-card.collapsed .axis-body { display: none; }
+  .axis-body { border-top: 1px solid var(--border); }
+  .question-row { padding: 1rem 1.4rem; border-bottom: 1px solid #1e2a3a; display: flex; flex-direction: column; gap: 0.6rem; }
+  .question-row:last-child { border-bottom: none; }
+  .q-text { font-size: 0.92rem; line-height: 1.5; font-family: 'Lora', serif; font-style: italic; }
+  .score-buttons { display: flex; gap: 0.35rem; }
+  .score-btn { flex: 1; height: 48px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card2); color: var(--muted); cursor: pointer; transition: all 0.15s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .btn-num { font-size: 1rem; font-weight: 700; line-height: 1; }
+  .btn-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
+  .score-btn:hover { border-color: var(--accent); color: var(--accent); background: #2f3d52; }
+  .score-btn.selected { color: #1c2433 !important; border-color: transparent !important; }
+
+  .sidebar { position: sticky; top: 70px; display: flex; flex-direction: column; gap: 1.2rem; }
+  .chart-card, .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; }
+  .chart-card h3, .summary-card h3 { font-family: 'Lora', serif; font-size: 0.9rem; color: var(--accent); margin-bottom: 1rem; }
+  canvas#radar { display: block; width: 100%; max-width: 280px; margin: 0 auto; }
+  .summary-rows { display: flex; flex-direction: column; gap: 0.55rem; }
+  .summary-row { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; }
+  .sum-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sum-name { flex: 1; color: var(--muted); }
+  .sum-bar-wrap { width: 70px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .sum-bar { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+  .sum-score { font-weight: 600; width: 18px; text-align: right; font-size: 0.82rem; }
+  .total-row { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; }
+  .total-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .total-value { font-family: 'Lora', serif; font-size: 2rem; color: var(--accent); }
+  .total-max { font-size: 0.75rem; color: var(--muted); margin-left: 2px; }
+
+  /* PRINT STYLES */
+  @media print {
+    body { background: white; color: #1a1a1a; font-size: 12px; }
+    .topbar { position: static; background: white; border-bottom: 2px solid #1a1a1a; padding: 0.5rem 1rem; }
+    .topbar-title { color: #1a1a1a; font-size: 1.2rem; }
+    .print-btn, .progress-bar-wrap, #answered-count, .toggle-arrow { display: none !important; }
+    .name-input, .date-input { border: none; color: #1a1a1a; background: white; font-weight: 600; }
+    .main { display: block; padding: 1rem; }
+    .sidebar { position: static; }
+    .chart-card, .summary-card { background: white; border: 1px solid #ccc; margin-bottom: 1rem; }
+    .chart-card h3, .summary-card h3 { color: #1a1a1a; }
+    .axis-card { background: white; border: 1px solid #ccc; margin-bottom: 0.8rem; break-inside: avoid; }
+    .axis-card.collapsed .axis-body { display: block !important; }
+    .axis-head { background: #f5f5f5 !important; }
+    .axis-name { color: #1a1a1a; }
+    .axis-desc { color: #555; }
+    .axis-score-badge { color: #1a1a1a !important; }
+    .axis-body { border-top: 1px solid #ccc; }
+    .question-row { border-bottom: 1px solid #eee; padding: 0.5rem 1rem; }
+    .q-text { color: #1a1a1a; font-size: 0.85rem; }
+    .score-buttons { gap: 0.2rem; }
+    .score-btn { height: 32px; border: 1px solid #ccc; background: white; color: #555; }
+    .score-btn.selected { color: white !important; }
+    .sum-name { color: #555; }
+    .sum-bar-wrap { background: #eee; }
+    .total-label { color: #555; }
+    .total-value { color: #1a1a1a; }
+    .total-max { color: #555; }
+    canvas#radar { max-width: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">Samtalsstöd – Arbetsträning</div>
+  <div class="topbar-right">
+    <div class="print-area">
+      <input class="name-input" id="person-name" type="text" placeholder="Personens namn">
+      <input class="date-input" id="meeting-date" type="date">
+      <button class="print-btn" onclick="window.print()">🖨 Skriv ut</button>
+    </div>
+    <div class="topbar-meta">
+      <span id="answered-count">0 / 24 frågor</span>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="axis-section" id="cards"></div>
+  <div class="sidebar">
+    <div class="chart-card"><h3>Profil</h3><canvas id="radar" width="280" height="280"></canvas></div>
+    <div class="summary-card">
+      <h3>Sammanfattning</h3>
+      <div class="summary-rows" id="summary-rows"></div>
+      <div class="total-row">
+        <span class="total-label">Totalt</span>
+        <div><span class="total-value" id="total-val">–</span><span class="total-max">/ 120</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Set today's date by default
+document.getElementById('meeting-date').valueAsDate = new Date();
+
+const LABELS = ["","Sällan","Ibland","Ofta","Mestadels","Alltid"];
+
+const axes = [
+  { name:"Uthållighet", desc:"Orkar personen arbeta under passet?", color:"#e07b6a", questions:[
+    "Personen arbetar aktivt under hela passet utan längre avbrott",
+    "Personen återgår till arbetet efter paus utan påminnelse",
+    "Personen visar energi och fokus även mot slutet av passet",
+    "Personen klarar av att hålla igång även när uppgiften tar tid"
+  ]},
+  { name:"Social samvaro", desc:"Trivs personen med andra på arbetsplatsen?", color:"#e8b86d", questions:[
+    "Personen hälsar på och har ögonkontakt med kollegor",
+    "Personen söker kontakt med andra på ett naturligt sätt",
+    "Personen tar emot återkoppling utan att bli upprörd eller tystna",
+    "Personen frågar om hjälp när något är oklart"
+  ]},
+  { name:"Förstå uppgifter", desc:"Tar personen till sig instruktioner?", color:"#7eb8a4", questions:[
+    "Personen sätter igång med uppgiften efter en instruktion",
+    "Personen utför uppgiften på rätt sätt utan att behöva korrigeras",
+    "Personen frågar när något är oklart istället för att gissa",
+    "Personen avslutar uppgiften och går vidare på ett naturligt sätt"
+  ]},
+  { name:"Eget initiativ", desc:"Tar personen egna steg framåt?", color:"#6d9ee8", questions:[
+    "Personen börjar med uppgiften utan att behöva uppmanas",
+    "Personen fortsätter arbeta även när handledaren inte är närvarande",
+    "Personen tar egna små beslut under arbetet",
+    "Personen visar intresse för att lära sig nya saker"
+  ]},
+  { name:"Hantera förändringar", desc:"Klarar personen av det oväntade?", color:"#b86de8", questions:[
+    "Personen accepterar ändringar i dagens planering utan stark reaktion",
+    "Personen hittar en lösning eller ber om hjälp när något krånglar",
+    "Personen anpassar sig till nya rutiner eller kollegor inom rimlig tid",
+    "Personen behåller arbetsförmågan även när det uppstår oväntade situationer"
+  ]},
+  { name:"Närvaro & rutiner", desc:"Fungerar vardagen runt arbetspasset?", color:"#e8946d", questions:[
+    "Personen kommer i tid till arbetspasset",
+    "Personen meddelar i förväg när hen inte kan komma",
+    "Personen är redo att arbeta när hen anländer",
+    "Personen har en stabil närvaro över tid utan stort frånvaromönster"
+  ]}
+];
+
+const scores = axes.map(a => a.questions.map(() => 0));
+function axisScore(i){return scores[i].reduce((a,b)=>a+b,0);}
+function axisMax(i){return axes[i].questions.length*5;}
+function totalAnswered(){return scores.flat().filter(v=>v>0).length;}
+
+const SZ=280,CX=140,CY=140,R=100,LV=5;
+function rp(i,val,n,r){const a=(2*Math.PI*i/n)-Math.PI/2;return{x:CX+r*val*Math.cos(a),y:CY+r*val*Math.sin(a)};}
+
+function drawRadar(){
+  const ctx=document.getElementById('radar').getContext('2d');
+  ctx.clearRect(0,0,SZ,SZ);const n=axes.length;
+  for(let l=1;l<=LV;l++){ctx.beginPath();for(let i=0;i<n;i++){const p=rp(i,l/LV,n,R);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}ctx.closePath();ctx.strokeStyle=l===LV?'#364558':'#2a3649';ctx.lineWidth=l===LV?1.2:0.6;ctx.stroke();}
+  const shorts=["Uthåll.","Social","Uppgift","Initiativ","Förändring","Närvaro"];
+  for(let i=0;i<n;i++){const p=rp(i,1,n,R);ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#2e3d52';ctx.lineWidth=0.7;ctx.stroke();const lp=rp(i,1,n,R+22);ctx.fillStyle=axes[i].color;ctx.font='bold 9.5px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(shorts[i],lp.x,lp.y);}
+  ctx.beginPath();for(let i=0;i<n;i++){const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;const p=rp(i,val,n,R);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}ctx.closePath();ctx.fillStyle='rgba(232,184,109,0.13)';ctx.fill();ctx.strokeStyle='#e8b86d';ctx.lineWidth=1.8;ctx.stroke();
+  for(let i=0;i<n;i++){const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;const p=rp(i,val,n,R);ctx.beginPath();ctx.arc(p.x,p.y,4,0,2*Math.PI);ctx.fillStyle=axes[i].color;ctx.fill();ctx.strokeStyle='#1c2433';ctx.lineWidth=1.5;ctx.stroke();}
+}
+
+function updateUI(){
+  const answered=totalAnswered(),total=scores.flat().length;
+  document.getElementById('answered-count').textContent=answered+' / '+total+' frågor';
+  document.getElementById('progress-fill').style.width=(answered/total*100).toFixed(0)+'%';
+  axes.forEach((ax,i)=>{
+    const sc=axisScore(i);
+    document.getElementById('sum-bar-'+i).style.width=(sc/axisMax(i)*100).toFixed(0)+'%';
+    document.getElementById('sum-score-'+i).textContent=sc||'–';
+    document.getElementById('axis-badge-'+i).textContent=sc||'–';
+  });
+  const t=scores.flat().reduce((a,b)=>a+b,0);
+  document.getElementById('total-val').textContent=t||'–';
+  drawRadar();
+}
+
+function buildUI(){
+  const cardsEl=document.getElementById('cards'),sumEl=document.getElementById('summary-rows');
+  axes.forEach((ax,ai)=>{
+    const card=document.createElement('div');
+    card.className='axis-card';card.id='card-'+ai;
+    const qs=ax.questions.map((q,qi)=>`
+      <div class="question-row">
+        <div class="q-text">${q}</div>
+        <div class="score-buttons">
+          ${[1,2,3,4,5].map(v=>`<button class="score-btn" data-ai="${ai}" data-qi="${qi}" data-v="${v}"><span class="btn-num">${v}</span><span class="btn-label">${LABELS[v]}</span></button>`).join('')}
+        </div>
+      </div>`).join('');
+    card.innerHTML=`
+      <div class="axis-head" onclick="toggleCard(${ai})">
+        <div class="axis-icon" style="background:${ax.color}">${ai+1}</div>
+        <div class="axis-info">
+          <div class="axis-name">${ax.name}</div>
+          <div class="axis-desc">${ax.desc}</div>
+        </div>
+        <div class="axis-score-badge" id="axis-badge-${ai}" style="color:${ax.color}">–</div>
+        <div class="toggle-arrow">▾</div>
+      </div>
+      <div class="axis-body">${qs}</div>`;
+    cardsEl.appendChild(card);
+
+    const row=document.createElement('div');row.className='summary-row';
+    row.innerHTML=`<div class="sum-dot" style="background:${ax.color}"></div><span class="sum-name">${ax.name}</span><div class="sum-bar-wrap"><div class="sum-bar" id="sum-bar-${ai}" style="background:${ax.color};width:0%"></div></div><span class="sum-score" id="sum-score-${ai}" style="color:${ax.color}">–</span>`;
+    sumEl.appendChild(row);
+  });
+
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest('.score-btn');if(!btn)return;
+    const ai=+btn.dataset.ai,qi=+btn.dataset.qi,v=+btn.dataset.v;
+    btn.closest('.score-buttons').querySelectorAll('.score-btn').forEach(b=>{b.classList.remove('selected');b.style.background='';b.style.color='';});
+    btn.classList.add('selected');btn.style.background=axes[ai].color;btn.style.color='#1c2433';
+    scores[ai][qi]=v;updateUI();
+  });
+  drawRadar();
+}
+
+function toggleCard(ai){document.getElementById('card-'+ai).classList.toggle('collapsed');}
+buildUI();
+</script>
+</body>
+</html>
