@@ -15,10 +15,12 @@
   .topbar-meta { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 1.2rem; }
   .progress-bar-wrap { width: 120px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
-  .print-area { display: flex; align-items: center; gap: 0.8rem; }
+  .print-area { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
   .name-input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 5px; font-family: 'Source Sans 3', sans-serif; font-size: 0.85rem; width: 160px; }
   .name-input::placeholder { color: var(--muted); }
   .date-input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 5px; font-family: 'Source Sans 3', sans-serif; font-size: 0.85rem; width: 140px; }
+  .edit-btn { background: var(--card2); border: 1px solid var(--accent); color: var(--accent); padding: 0.45rem 1.1rem; border-radius: 5px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: opacity 0.15s; }
+  .edit-btn:hover { opacity: 0.8; }
   .print-btn { background: var(--accent); color: #1c2433; border: none; padding: 0.45rem 1.1rem; border-radius: 5px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: opacity 0.15s; }
   .print-btn:hover { opacity: 0.85; }
   .main { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
@@ -59,11 +61,59 @@
   .total-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
   .total-value { font-family: 'Lora', serif; font-size: 2rem; color: var(--accent); }
   .total-max { font-size: 0.75rem; color: var(--muted); margin-left: 2px; }
+
+  /* EDITOR OVERLAY */
+  .editor-overlay { display: none; position: fixed; inset: 0; background: rgba(15,20,30,0.88); z-index: 200; overflow-y: auto; padding: 2rem 1rem; }
+  .editor-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .editor-box { background: #1e2b3e; border: 1px solid var(--border); border-radius: 10px; width: 100%; max-width: 720px; overflow: hidden; }
+  .editor-header { padding: 1rem 1.4rem; background: #161e2b; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .editor-header h2 { font-family: 'Lora', serif; font-size: 1rem; color: var(--accent); }
+  .editor-close { background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0 0.3rem; line-height: 1; }
+  .editor-close:hover { color: var(--text); }
+  .editor-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .editor-tab { padding: 0.65rem 1.3rem; font-size: 0.83rem; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Source Sans 3', sans-serif; transition: color 0.15s; }
+  .editor-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .editor-tab:hover:not(.active) { color: var(--text); }
+  .editor-content { padding: 1.2rem 1.4rem; }
+  .axis-editor-section { margin-bottom: 0.5rem; }
+  .axis-editor-head { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 0.9rem; background: var(--card); border-radius: 6px; cursor: pointer; margin-bottom: 0.4rem; }
+  .axis-editor-head .ax-num { width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: #1c2433; flex-shrink: 0; }
+  .axis-editor-head .ax-label { flex: 1; font-size: 0.87rem; font-weight: 500; }
+  .axis-editor-head .ax-toggle { font-size: 0.68rem; color: var(--muted); transition: transform 0.2s; }
+  .axis-editor-section.ax-open .ax-toggle { transform: rotate(0deg); }
+  .axis-editor-section:not(.ax-open) .ax-toggle { transform: rotate(-90deg); }
+  .axis-editor-section:not(.ax-open) .axis-q-list { display: none; }
+  .axis-q-list { padding: 0 0 0.5rem 0; }
+  .axis-meta-row { display: flex; gap: 0.6rem; margin-bottom: 0.6rem; }
+  .axis-meta-row input { flex: 1; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.42rem 0.7rem; border-radius: 5px; font-size: 0.83rem; font-family: 'Source Sans 3', sans-serif; }
+  .axis-meta-row input:focus { outline: none; border-color: var(--accent); }
+  .q-edit-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+  .q-edit-row input { flex: 1; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 0.7rem; border-radius: 5px; font-size: 0.83rem; font-family: 'Source Sans 3', sans-serif; }
+  .q-edit-row input:focus { outline: none; border-color: var(--accent); }
+  .q-edit-row input::placeholder { color: var(--muted); }
+  .q-del-btn { background: none; border: 1px solid #3a4a5e; color: var(--muted); border-radius: 4px; width: 28px; height: 28px; cursor: pointer; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-family: sans-serif; }
+  .q-del-btn:hover { border-color: #e07b6a; color: #e07b6a; }
+  .add-q-btn { background: none; border: 1px dashed var(--border); color: var(--muted); border-radius: 5px; padding: 0.4rem 0.9rem; font-size: 0.8rem; cursor: pointer; margin-top: 0.3rem; transition: all 0.15s; width: 100%; text-align: left; font-family: 'Source Sans 3', sans-serif; }
+  .add-q-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .editor-footer { padding: 0.9rem 1.4rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.7rem; background: #161e2b; }
+  .save-btn { background: var(--accent); color: #1c2433; border: none; padding: 0.52rem 1.4rem; border-radius: 5px; font-weight: 600; font-size: 0.87rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+  .save-btn:hover { opacity: 0.85; }
+  .cancel-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 0.52rem 1.1rem; border-radius: 5px; font-size: 0.87rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+  .cancel-btn:hover { color: var(--text); }
+  .export-import-section { display: flex; flex-direction: column; gap: 0.9rem; }
+  .export-import-section label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; display: block; }
+  .export-import-section textarea { width: 100%; height: 240px; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.8rem; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 0.76rem; resize: vertical; }
+  .export-import-section textarea:focus { outline: none; border-color: var(--accent); }
+  .exp-imp-btns { display: flex; gap: 0.6rem; }
+  .imp-btn { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 0.48rem 1.1rem; border-radius: 5px; font-size: 0.83rem; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: border-color 0.15s; }
+  .imp-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .imp-status { font-size: 0.8rem; color: #7eb8a4; }
+
   @media print {
     body { background: white; color: #1a1a1a; font-size: 12px; }
     .topbar { position: static; background: white; border-bottom: 2px solid #1a1a1a; padding: 0.5rem 1rem; }
     .topbar-title { color: #1a1a1a; font-size: 1.2rem; }
-    .print-btn, .progress-bar-wrap, #answered-count, .toggle-arrow { display: none !important; }
+    .print-btn, .edit-btn, .progress-bar-wrap, #answered-count, .toggle-arrow { display: none !important; }
     .name-input, .date-input { border: none; color: #1a1a1a; background: white; font-weight: 600; }
     .main { display: block; padding: 1rem; }
     .sidebar { position: static; }
@@ -87,6 +137,7 @@
     .total-value { color: #1a1a1a; }
     .total-max { color: #555; }
     canvas#radar { max-width: 200px; }
+    .editor-overlay { display: none !important; }
   }
 </style>
 </head>
@@ -97,6 +148,7 @@
     <div class="print-area">
       <input class="name-input" id="person-name" type="text" placeholder="Personens namn">
       <input class="date-input" id="meeting-date" type="date">
+      <button class="edit-btn" onclick="openEditor()">✎ Redigera frågor</button>
       <button class="print-btn" onclick="window.print()">Skriv ut</button>
     </div>
     <div class="topbar-meta">
@@ -105,6 +157,7 @@
     </div>
   </div>
 </div>
+
 <div class="main">
   <div class="axis-section" id="cards"></div>
   <div class="sidebar">
@@ -114,15 +167,45 @@
       <div class="summary-rows" id="summary-rows"></div>
       <div class="total-row">
         <span class="total-label">Totalt</span>
-        <div><span class="total-value" id="total-val">–</span><span class="total-max">/ 120</span></div>
+        <div><span class="total-value" id="total-val">–</span><span class="total-max" id="total-max">/ 120</span></div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- EDITOR OVERLAY -->
+<div class="editor-overlay" id="editor-overlay">
+  <div class="editor-box">
+    <div class="editor-header">
+      <h2>Redigera frågor</h2>
+      <button class="editor-close" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="editor-tabs">
+      <button class="editor-tab active" id="tab-edit" onclick="switchTab('edit')">Redigera</button>
+      <button class="editor-tab" id="tab-json" onclick="switchTab('json')">Exportera / Importera</button>
+    </div>
+    <div id="panel-edit" class="editor-content" style="max-height:62vh;overflow-y:auto;"></div>
+    <div id="panel-json" class="editor-content export-import-section" style="display:none;">
+      <label>JSON-data (kopiera för att spara, klistra in för att återställa)</label>
+      <textarea id="json-area" spellcheck="false"></textarea>
+      <div class="exp-imp-btns">
+        <button class="imp-btn" onclick="exportJSON()">Kopiera JSON</button>
+        <button class="imp-btn" onclick="importJSON()">Importera JSON</button>
+      </div>
+      <div class="imp-status" id="imp-status"></div>
+    </div>
+    <div class="editor-footer">
+      <button class="cancel-btn" onclick="closeEditor()">Avbryt</button>
+      <button class="save-btn" onclick="saveAndClose()">Spara ändringar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 document.getElementById('meeting-date').valueAsDate = new Date();
 const LABELS = ["","Sällan","Ibland","Ofta","Mestadels","Alltid"];
-const axes = [
+
+let axes = [
   { name:"Uthållighet", desc:"Orkar personen arbeta under passet?", color:"#e07b6a", questions:["Personen arbetar aktivt under hela passet utan längre avbrott","Personen återgår till arbetet efter paus utan påminnelse","Personen visar energi och fokus även mot slutet av passet","Personen klarar av att hålla igång även när uppgiften tar tid"]},
   { name:"Social samvaro", desc:"Trivs personen med andra på arbetsplatsen?", color:"#e8b86d", questions:["Personen hälsar på och har ögonkontakt med kollegor","Personen söker kontakt med andra på ett naturligt sätt","Personen tar emot återkoppling utan att bli upprörd eller tystna","Personen frågar om hjälp när något är oklart"]},
   { name:"Förstå uppgifter", desc:"Tar personen till sig instruktioner?", color:"#7eb8a4", questions:["Personen sätter igång med uppgiften efter en instruktion","Personen utför uppgiften på rätt sätt utan att behöva korrigeras","Personen frågar när något är oklart istället för att gissa","Personen avslutar uppgiften och går vidare på ett naturligt sätt"]},
@@ -130,52 +213,169 @@ const axes = [
   { name:"Hantera förändringar", desc:"Klarar personen av det oväntade?", color:"#b86de8", questions:["Personen accepterar ändringar i dagens planering utan stark reaktion","Personen hittar en lösning eller ber om hjälp när något krånglar","Personen anpassar sig till nya rutiner eller kollegor inom rimlig tid","Personen behåller arbetsförmågan även när det uppstår oväntade situationer"]},
   { name:"Närvaro & rutiner", desc:"Fungerar vardagen runt arbetspasset?", color:"#e8946d", questions:["Personen kommer i tid till arbetspasset","Personen meddelar i förväg när hen inte kan komma","Personen är redo att arbeta när hen anländer","Personen har en stabil närvaro över tid utan stort frånvaromönster"]}
 ];
-const scores = axes.map(a => a.questions.map(() => 0));
-function axisScore(i){return scores[i].reduce((a,b)=>a+b,0);}
-function axisMax(i){return axes[i].questions.length*5;}
-function totalAnswered(){return scores.flat().filter(v=>v>0).length;}
+
+let scores = axes.map(a => a.questions.map(() => 0));
+let editDraft = null;
+
+function axisScore(i){ return scores[i].reduce((a,b)=>a+b,0); }
+function axisMax(i){ return axes[i].questions.length * 5; }
+function totalAnswered(){ return scores.flat().filter(v=>v>0).length; }
+function totalQuestions(){ return scores.flat().length; }
+
 const SZ=280,CX=140,CY=140,R=100,LV=5;
-function rp(i,val,n,r){const a=(2*Math.PI*i/n)-Math.PI/2;return{x:CX+r*val*Math.cos(a),y:CY+r*val*Math.sin(a)};}
+function rp(i,val,n,r){ const a=(2*Math.PI*i/n)-Math.PI/2; return{x:CX+r*val*Math.cos(a),y:CY+r*val*Math.sin(a)}; }
+
 function drawRadar(){
   const ctx=document.getElementById('radar').getContext('2d');
-  ctx.clearRect(0,0,SZ,SZ);const n=axes.length;
-  for(let l=1;l<=LV;l++){ctx.beginPath();for(let i=0;i<n;i++){const p=rp(i,l/LV,n,R);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}ctx.closePath();ctx.strokeStyle=l===LV?'#364558':'#2a3649';ctx.lineWidth=l===LV?1.2:0.6;ctx.stroke();}
-  const shorts=["Uthåll.","Social","Uppgift","Initiativ","Förändring","Närvaro"];
-  for(let i=0;i<n;i++){const p=rp(i,1,n,R);ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#2e3d52';ctx.lineWidth=0.7;ctx.stroke();const lp=rp(i,1,n,R+22);ctx.fillStyle=axes[i].color;ctx.font='bold 9.5px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(shorts[i],lp.x,lp.y);}
-  ctx.beginPath();for(let i=0;i<n;i++){const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;const p=rp(i,val,n,R);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}ctx.closePath();ctx.fillStyle='rgba(232,184,109,0.13)';ctx.fill();ctx.strokeStyle='#e8b86d';ctx.lineWidth=1.8;ctx.stroke();
-  for(let i=0;i<n;i++){const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;const p=rp(i,val,n,R);ctx.beginPath();ctx.arc(p.x,p.y,4,0,2*Math.PI);ctx.fillStyle=axes[i].color;ctx.fill();ctx.strokeStyle='#1c2433';ctx.lineWidth=1.5;ctx.stroke();}
+  ctx.clearRect(0,0,SZ,SZ); const n=axes.length;
+  for(let l=1;l<=LV;l++){
+    ctx.beginPath();
+    for(let i=0;i<n;i++){const p=rp(i,l/LV,n,R);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+    ctx.closePath(); ctx.strokeStyle=l===LV?'#364558':'#2a3649'; ctx.lineWidth=l===LV?1.2:0.6; ctx.stroke();
+  }
+  for(let i=0;i<n;i++){
+    const p=rp(i,1,n,R);
+    ctx.beginPath(); ctx.moveTo(CX,CY); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#2e3d52'; ctx.lineWidth=0.7; ctx.stroke();
+    const lp=rp(i,1,n,R+22);
+    ctx.fillStyle=axes[i].color; ctx.font='bold 9.5px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(axes[i].name.split(' ')[0], lp.x, lp.y);
+  }
+  ctx.beginPath();
+  for(let i=0;i<n;i++){
+    const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;
+    const p=rp(i,val,n,R); i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);
+  }
+  ctx.closePath(); ctx.fillStyle='rgba(232,184,109,0.13)'; ctx.fill(); ctx.strokeStyle='#e8b86d'; ctx.lineWidth=1.8; ctx.stroke();
+  for(let i=0;i<n;i++){
+    const val=axisMax(i)>0?axisScore(i)/axisMax(i):0;
+    const p=rp(i,val,n,R);
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,2*Math.PI); ctx.fillStyle=axes[i].color; ctx.fill(); ctx.strokeStyle='#1c2433'; ctx.lineWidth=1.5; ctx.stroke();
+  }
 }
+
 function updateUI(){
-  const answered=totalAnswered(),total=scores.flat().length;
+  const answered=totalAnswered(), total=totalQuestions();
   document.getElementById('answered-count').textContent=answered+' / '+total+' frågor';
-  document.getElementById('progress-fill').style.width=(answered/total*100).toFixed(0)+'%';
-  axes.forEach((ax,i)=>{const sc=axisScore(i);document.getElementById('sum-bar-'+i).style.width=(sc/axisMax(i)*100).toFixed(0)+'%';document.getElementById('sum-score-'+i).textContent=sc||'–';document.getElementById('axis-badge-'+i).textContent=sc||'–';});
-  const t=scores.flat().reduce((a,b)=>a+b,0);document.getElementById('total-val').textContent=t||'–';
+  document.getElementById('progress-fill').style.width=(total>0?answered/total*100:0).toFixed(0)+'%';
+  axes.forEach((ax,i)=>{
+    const sc=axisScore(i);
+    const barEl=document.getElementById('sum-bar-'+i);
+    const scoreEl=document.getElementById('sum-score-'+i);
+    const badgeEl=document.getElementById('axis-badge-'+i);
+    if(barEl) barEl.style.width=(sc/axisMax(i)*100).toFixed(0)+'%';
+    if(scoreEl) scoreEl.textContent=sc||'–';
+    if(badgeEl) badgeEl.textContent=sc||'–';
+  });
+  const t=scores.flat().reduce((a,b)=>a+b,0);
+  document.getElementById('total-val').textContent=t||'–';
+  document.getElementById('total-max').textContent='/ '+(axes.reduce((s,a)=>s+a.questions.length,0)*5);
   drawRadar();
 }
+
 function buildUI(){
-  const cardsEl=document.getElementById('cards'),sumEl=document.getElementById('summary-rows');
+  const cardsEl=document.getElementById('cards');
+  const sumEl=document.getElementById('summary-rows');
+  cardsEl.innerHTML=''; sumEl.innerHTML='';
   axes.forEach((ax,ai)=>{
-    const card=document.createElement('div');card.className='axis-card';card.id='card-'+ai;
-    const qs=ax.questions.map((q,qi)=>'<div class="question-row"><div class="q-text">'+q+'</div><div class="score-buttons">'+[1,2,3,4,5].map(v=>'<button class="score-btn" data-ai="'+ai+'" data-qi="'+qi+'" data-v="'+v+'"><span class="btn-num">'+v+'</span><span class="btn-label">'+LABELS[v]+'</span></button>').join('')+'</div></div>').join('');
+    const card=document.createElement('div'); card.className='axis-card'; card.id='card-'+ai;
+    const qs=ax.questions.map((q,qi)=>'<div class="question-row"><div class="q-text">'+q+'</div><div class="score-buttons">'+
+      [1,2,3,4,5].map(v=>{
+        const sel=scores[ai]&&scores[ai][qi]===v;
+        return '<button class="score-btn'+(sel?' selected':'')+'" data-ai="'+ai+'" data-qi="'+qi+'" data-v="'+v+'"'+(sel?' style="background:'+ax.color+';color:#1c2433"':'')+'><span class="btn-num">'+v+'</span><span class="btn-label">'+LABELS[v]+'</span></button>';
+      }).join('')+'</div></div>').join('');
     card.innerHTML='<div class="axis-head" onclick="toggleCard('+ai+')"><div class="axis-icon" style="background:'+ax.color+'">'+(ai+1)+'</div><div class="axis-info"><div class="axis-name">'+ax.name+'</div><div class="axis-desc">'+ax.desc+'</div></div><div class="axis-score-badge" id="axis-badge-'+ai+'" style="color:'+ax.color+'">–</div><div class="toggle-arrow">▾</div></div><div class="axis-body">'+qs+'</div>';
     cardsEl.appendChild(card);
-    const row=document.createElement('div');row.className='summary-row';
+    const row=document.createElement('div'); row.className='summary-row';
     row.innerHTML='<div class="sum-dot" style="background:'+ax.color+'"></div><span class="sum-name">'+ax.name+'</span><div class="sum-bar-wrap"><div class="sum-bar" id="sum-bar-'+ai+'" style="background:'+ax.color+';width:0%"></div></div><span class="sum-score" id="sum-score-'+ai+'" style="color:'+ax.color+'">–</span>';
     sumEl.appendChild(row);
   });
-  document.addEventListener('click',e=>{
-    const btn=e.target.closest('.score-btn');if(!btn)return;
-    const ai=+btn.dataset.ai,qi=+btn.dataset.qi,v=+btn.dataset.v;
-    btn.closest('.score-buttons').querySelectorAll('.score-btn').forEach(b=>{b.classList.remove('selected');b.style.background='';b.style.color='';});
-    btn.classList.add('selected');btn.style.background=axes[ai].color;btn.style.color='#1c2433';
-    scores[ai][qi]=v;updateUI();
-  });
-  drawRadar();
+  document.removeEventListener('click', scoreClickHandler);
+  document.addEventListener('click', scoreClickHandler);
+  updateUI();
 }
-function toggleCard(ai){document.getElementById('card-'+ai).classList.toggle('collapsed');}
+
+function scoreClickHandler(e){
+  const btn=e.target.closest('.score-btn'); if(!btn)return;
+  const ai=+btn.dataset.ai, qi=+btn.dataset.qi, v=+btn.dataset.v;
+  btn.closest('.score-buttons').querySelectorAll('.score-btn').forEach(b=>{b.classList.remove('selected');b.style.background='';b.style.color='';});
+  btn.classList.add('selected'); btn.style.background=axes[ai].color; btn.style.color='#1c2433';
+  scores[ai][qi]=v; updateUI();
+}
+
+function toggleCard(ai){ document.getElementById('card-'+ai).classList.toggle('collapsed'); }
+
+/* ---- EDITOR ---- */
+function openEditor(){
+  editDraft=axes.map(a=>({name:a.name,desc:a.desc,color:a.color,questions:[...a.questions]}));
+  renderEditPanel();
+  document.getElementById('editor-overlay').classList.add('open');
+  switchTab('edit');
+}
+function closeEditor(){ document.getElementById('editor-overlay').classList.remove('open'); }
+
+function saveAndClose(){
+  axes=editDraft.map(a=>({name:a.name,desc:a.desc,color:a.color,questions:[...a.questions]}));
+  scores=axes.map(a=>a.questions.map(()=>0));
+  buildUI();
+  closeEditor();
+}
+
+function switchTab(t){
+  document.getElementById('tab-edit').className='editor-tab'+(t==='edit'?' active':'');
+  document.getElementById('tab-json').className='editor-tab'+(t==='json'?' active':'');
+  document.getElementById('panel-edit').style.display=t==='edit'?'':'none';
+  document.getElementById('panel-json').style.display=t==='json'?'':'none';
+  if(t==='json'){ document.getElementById('json-area').value=JSON.stringify(editDraft,null,2); }
+}
+
+function renderEditPanel(){
+  const el=document.getElementById('panel-edit');
+  el.innerHTML='';
+  editDraft.forEach((ax,ai)=>{
+    const sec=document.createElement('div'); sec.className='axis-editor-section ax-open'; sec.id='axsec-'+ai;
+    const metaRow='<div class="axis-meta-row"><input type="text" placeholder="Axelnamn" value="'+esc(ax.name)+'" oninput="editDraft['+ai+'].name=this.value;document.getElementById(\'axlabel-'+ai+'\').textContent=this.value" style="flex:1.2"><input type="text" placeholder="Beskrivning" value="'+esc(ax.desc)+'" oninput="editDraft['+ai+'].desc=this.value" style="flex:2"></div>';
+    const qRows=ax.questions.map((q,qi)=>'<div class="q-edit-row" id="qrow-'+ai+'-'+qi+'"><input type="text" value="'+esc(q)+'" placeholder="Skriv fråga..." oninput="editDraft['+ai+'].questions['+qi+']=this.value"><button class="q-del-btn" onclick="deleteQ('+ai+','+qi+')" title="Ta bort">✕</button></div>').join('');
+    sec.innerHTML='<div class="axis-editor-head" onclick="toggleAxSec('+ai+')"><div class="ax-num" style="background:'+ax.color+'">'+(ai+1)+'</div><span class="ax-label" id="axlabel-'+ai+'">'+esc(ax.name)+'</span><span class="ax-toggle">▾</span></div><div class="axis-q-list">'+metaRow+qRows+'<button class="add-q-btn" onclick="addQ('+ai+')">+ Lägg till fråga</button></div>';
+    el.appendChild(sec);
+  });
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toggleAxSec(ai){ document.getElementById('axsec-'+ai).classList.toggle('ax-open'); }
+
+function addQ(ai){
+  editDraft[ai].questions.push('');
+  renderEditPanel();
+  const inputs=document.querySelectorAll('#axsec-'+ai+' .q-edit-row input');
+  if(inputs.length) inputs[inputs.length-1].focus();
+}
+function deleteQ(ai,qi){
+  if(editDraft[ai].questions.length<=1){ alert('Minst en fråga krävs per axel.'); return; }
+  editDraft[ai].questions.splice(qi,1);
+  renderEditPanel();
+}
+
+function exportJSON(){
+  const ta=document.getElementById('json-area');
+  ta.select(); try{ document.execCommand('copy'); }catch(e){}
+  document.getElementById('imp-status').textContent='Kopierat till urklipp!';
+  setTimeout(()=>document.getElementById('imp-status').textContent='', 2500);
+}
+function importJSON(){
+  try{
+    const data=JSON.parse(document.getElementById('json-area').value);
+    if(!Array.isArray(data)) throw new Error();
+    editDraft=data.map(a=>({name:a.name||'',desc:a.desc||'',color:a.color||'#888',questions:Array.isArray(a.questions)?a.questions:[]}));
+    renderEditPanel();
+    switchTab('edit');
+    document.getElementById('imp-status').textContent='Importerat! Klicka "Spara ändringar" för att tillämpa.';
+    setTimeout(()=>document.getElementById('imp-status').textContent='', 4000);
+  }catch(e){
+    document.getElementById('imp-status').textContent='Ogiltig JSON – kontrollera formatet.';
+  }
+}
+
 buildUI();
 </script>
 </body>
 </html>
-
